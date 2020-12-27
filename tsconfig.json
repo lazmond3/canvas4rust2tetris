@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "noImplicitAny": true,
+    "module": "ES2020",
+    "target": "es5",
+    "allowJs": true
+  },
+  "files": [
+    "src/main.ts"
+  ]
+}
