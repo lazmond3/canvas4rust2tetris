@@ -1,4 +1,5 @@
 const sock = new WebSocket("ws://127.0.0.1:5001");
+import { ctx } from "./canvas";
 sock.addEventListener("open", (e) => {
   console.log("接続が開かれたときに呼び出されるイベント");
 });
@@ -8,6 +9,9 @@ sock.addEventListener("message", (message_e: MessageEvent<any>) => {
     "サーバーからメッセージを受信したときに呼び出されるイベント: " +
       `${message_e.data}`
   );
+  // fill green
+  ctx.fillStyle = "green";
+  ctx.fillRect(10, 10, 150, 100);
 });
 
 sock.addEventListener("close", (e) => {
