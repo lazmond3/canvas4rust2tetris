@@ -18,7 +18,7 @@ sock.addEventListener("error", (e) => {
 });
 
 const btn = document.querySelector("#hello-button");
-const input_value = document.querySelector("#input");
+const input_value = document.querySelector<HTMLInputElement>("#input");
 btn.addEventListener("click", () => {
   console.log(`input_value: ${input_value.value}`);
   sock.send(input_value.value);
