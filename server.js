@@ -13,7 +13,6 @@ s.on("connection", (ws) => {
       ws.send("hello from server");
     } else if (message === "test") {
       ws.send("test from server");
-      ws.send({ message: "from_server", error: null });
     }
   });
 });
