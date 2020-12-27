@@ -3,10 +3,16 @@
     "allowSyntheticDefaultImports": true,
     "noImplicitAny": true,
     "module": "ES2020",
+    "moduleResolution": "node",
     "target": "es5",
     "allowJs": true
   },
+  
   "files": [
-    "src/main.ts"
+    "src/main.ts",
+    "src/canvas.ts",
+  ],
+  "include": [
+    "./src/"
   ]
 }
