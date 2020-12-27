@@ -3,9 +3,10 @@ sock.addEventListener("open", (e) => {
   console.log("接続が開かれたときに呼び出されるイベント");
 });
 
-sock.addEventListener("message", (e) => {
+sock.addEventListener("message", (message_e: MessageEvent<any>) => {
   console.log(
-    "サーバーからメッセージを受信したときに呼び出されるイベント: " + `${e}`
+    "サーバーからメッセージを受信したときに呼び出されるイベント: " +
+      `${message_e.data}`
   );
 });
 
