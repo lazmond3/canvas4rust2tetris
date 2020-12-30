@@ -6,24 +6,47 @@ const hostname = "127.0.0.1";
 const api_port = 3000;
 const ws_port = 5001;
 
+// ws server
+const ws_message = make_ws_server();
+
 // API サーバ
 const api_server = http.createServer((req, res) => {
   // ここにrequestを書いていく
-  const ws_message = make_ws_server();
+  var bodyChunks = [];
+  let body;
+  req
+    .on("data", function (chunk) {
+      // You can process streamed parts here...
+      bodyChunks.push(chunk);
+    })
+    .on("end", function () {
+      const bodyString = Buffer.concat(bodyChunks);
+      body = JSON.parse(bodyString);
+      //   console.log("BODY: " + body);
+      // ...and/or process the entire body here.
+      console.log(`body: ${JSON.stringify(body)}`);
+      if (body.type === "one_word") {
+        const pos = body.pos;
+        const word = body.word;
+        console.log(`pos: ${pos}, word: ${word}`);
 
-  if (req.type === "one_word") {
-    const pos = req.position;
-    const word = req.word;
-
-    ws_message.then(({ ws, message }) => {
-      ws.send(JSON.stringify(req));
+        ws_message
+          .then((ws) => {
+            console.log(`send websocket`);
+            ws.send(JSON.stringify(body));
+            console.log(`send websocket`);
+          })
+          .catch((e) => {
+            console.log(`error in ws_message: ${e}`);
+          });
+      }
     });
-  }
 
   res.statusCode = 200;
   res.setHeader("Content-Type", "text/plain");
   res.end("Hello World\n");
 });
+
 api_server.listen(api_port, hostname, () => {
   console.log(
     `API Server running at http://${hostname}:${api_port}/: api server`
@@ -42,16 +65,13 @@ function make_ws_server() {
 
   return new Promise((resolve, reject) => {
     s.on("connection", (ws) => {
-      ws.on("message", (message) => {
-        resolve({ ws, message });
-        // console.log("Received: " + message);
-
-        // if (message === "hello") {
-        //   ws.send("hello from server");
-        // } else if (message === "test") {
-        //   ws.send("test from server");
-        // }
-      });
+      resolve(ws);
+      //   ws.on("message", (message) => {
+      //     resolve({ ws, message });
+      //   });
+    });
+    s.on("error", (e) => {
+      reject(e);
     });
   });
 }
