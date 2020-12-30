@@ -1,7 +1,7 @@
 // EXP: このファイルは、 API を叩かれたら、 websocketを通じて
 // html に入っている canvas のアップデートを行うもの。
-// TODO: nodejs による サーバを作成する
-// TODO: serverが自動でwsを繋ぎ直すようにしたい。
+// ✅ nodejs による サーバを作成する
+// ✅ serverが自動でwsを繋ぎ直すようにしたい。
 const http = require("http");
 const hostname = "127.0.0.1";
 const api_port = 3000;
@@ -19,11 +19,11 @@ const msock = (ws) => (req, res) => {
       const bodyString = Buffer.concat(bodyChunks);
       body = JSON.parse(bodyString);
       console.log(`body: ${JSON.stringify(body)}`);
+      // そのままバイパスするコード
       if (body.type === "one_word") {
         const pos = body.pos;
         const word = body.word;
         console.log(`pos: ${pos}, word: ${word}`);
-
         console.log(`send websocket`);
         ws.send(JSON.stringify(body));
       }
@@ -53,20 +53,13 @@ function up_ws_server() {
     if (api_server) {
       api_server.close();
     }
-    setTimeout(function () {
-      up_ws_server();
-    }, 1000);
   });
   s.on("connection", (ws) => {
     const method = msock(ws);
     if (api_server) {
       api_server.close();
     }
-    try {
-      api_server = http.createServer(method);
-    } catch (e) {
-      console.log(`address in use...`);
-    }
+    api_server = http.createServer(method);
     api_server.listen(api_port, hostname, () => {
       console.log(
         `API Server running at http://${hostname}:${api_port}/: api server`
