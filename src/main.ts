@@ -4,14 +4,28 @@ sock.addEventListener("open", (e) => {
   console.log("接続が開かれたときに呼び出されるイベント");
 });
 
-sock.addEventListener("message", (message_e: MessageEvent<any>) => {
-  console.log(
-    "サーバーからメッセージを受信したときに呼び出されるイベント: " +
-      `${message_e.data}`
-  );
-  // fill green
-  ctx.fillStyle = "green";
-  ctx.fillRect(10, 10, 150, 100);
+sock.addEventListener("message", (message_e: MessageEvent<string>) => {
+  console.log("メッセージ : " + `${message_e.data}`);
+  const data = JSON.parse(message_e.data);
+  if (data.type === "one_word") {
+    const pos = data.pos;
+    const word: string = data.word;
+    console.log(`one word req: pos: ${pos}, word: ${word}`);
+    const x = (pos % 32) * 16;
+    const y = Math.floor(pos / 32);
+    console.log(`x: ${x}, y: ${y}`);
+    for (var i = 0; i < word.length; i++) {
+      const char = word[i];
+      if (char === "O") {
+        ctx.fillStyle = "white";
+        ctx.fillRect(x + i, y, 10, 10);
+      } else {
+        ctx.fillStyle = "black";
+        ctx.fillRect(x + i, y, 10, 10);
+      }
+    }
+    console.log(`fill ends.`);
+  }
 });
 
 sock.addEventListener("close", (e) => {
