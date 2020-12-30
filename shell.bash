@@ -4,6 +4,6 @@ function po() {
     sleep 1
 }
 
-for i in {1..100}; do
+for i in {0..100}; do
     po $((i * 1));
 done
