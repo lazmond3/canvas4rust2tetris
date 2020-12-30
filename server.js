@@ -75,13 +75,7 @@ function make_ws_server() {
       ws_message = make_ws_server();
     });
     s.on("connection", (ws) => {
-      //   resolve({ ws, s });
       resolve(ws);
-      //   ws.on("message", (message) => {
-      //   });
-      //   ws.on("message", (message) => {
-      //     resolve({ ws, message });
-      //   });
     });
   });
 }
