@@ -8,7 +8,7 @@ const api_port = 3000;
 const ws_port = 5001;
 
 // ws server
-const ws_message = make_ws_server();
+let ws_message = make_ws_server();
 
 // API サーバ
 const api_server = http.createServer((req, res) => {
@@ -35,7 +35,9 @@ const api_server = http.createServer((req, res) => {
           .then((ws) => {
             console.log(`send websocket`);
             ws.send(JSON.stringify(body));
-            console.log(`send websocket`);
+            // s.on("connection", (ws) => {
+            //   ws.send(JSON.stringify(body));
+            // });
           })
           .catch((e) => {
             console.log(`error in ws_message: ${e}`);
@@ -65,14 +67,21 @@ function make_ws_server() {
   console.log(`start listening... : websocket server`);
 
   return new Promise((resolve, reject) => {
+    s.on("error", (e) => {
+      ws_message = make_ws_server();
+      reject(e);
+    });
+    s.on("close", () => {
+      ws_message = make_ws_server();
+    });
     s.on("connection", (ws) => {
+      //   resolve({ ws, s });
       resolve(ws);
+      //   ws.on("message", (message) => {
+      //   });
       //   ws.on("message", (message) => {
       //     resolve({ ws, message });
       //   });
-    });
-    s.on("error", (e) => {
-      reject(e);
     });
   });
 }
