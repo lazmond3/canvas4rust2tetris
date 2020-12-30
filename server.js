@@ -10,34 +10,29 @@ const ws_port = 5001;
 // ws server
 let ws_message = make_ws_server();
 
-// API サーバ
-const api_server = http.createServer((req, res) => {
+const make_http_server = (req, res) => {
   // ここにrequestを書いていく
   var bodyChunks = [];
   let body;
   req
     .on("data", function (chunk) {
-      // You can process streamed parts here...
       bodyChunks.push(chunk);
     })
     .on("end", function () {
       const bodyString = Buffer.concat(bodyChunks);
       body = JSON.parse(bodyString);
-      //   console.log("BODY: " + body);
-      // ...and/or process the entire body here.
       console.log(`body: ${JSON.stringify(body)}`);
       if (body.type === "one_word") {
         const pos = body.pos;
         const word = body.word;
         console.log(`pos: ${pos}, word: ${word}`);
 
+        // こいつがクロージャになっているために、
+        // ws_message が更新されても、反映されない.
         ws_message
           .then((ws) => {
             console.log(`send websocket`);
             ws.send(JSON.stringify(body));
-            // s.on("connection", (ws) => {
-            //   ws.send(JSON.stringify(body));
-            // });
           })
           .catch((e) => {
             console.log(`error in ws_message: ${e}`);
@@ -47,8 +42,11 @@ const api_server = http.createServer((req, res) => {
 
   res.statusCode = 200;
   res.setHeader("Content-Type", "text/plain");
-  res.end("Hello World\n");
-});
+  res.end("Received.\n");
+};
+
+// API サーバ
+const api_server = http.createServer(make_http_server);
 
 api_server.listen(api_port, hostname, () => {
   console.log(
