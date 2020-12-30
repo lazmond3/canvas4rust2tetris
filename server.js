@@ -46,7 +46,7 @@ const make_http_server = (req, res) => {
 };
 
 // API サーバ
-const api_server = http.createServer(make_http_server);
+let api_server = http.createServer(make_http_server);
 
 api_server.listen(api_port, hostname, () => {
   console.log(
@@ -66,14 +66,20 @@ function make_ws_server() {
 
   return new Promise((resolve, reject) => {
     s.on("error", (e) => {
-      ws_message = make_ws_server();
+      //ws_message には何もはいらない。
       reject(e);
     });
     s.on("close", () => {
-      ws_message = make_ws_server();
+      //ws_message には何もはいらない。
+      //   ws_message = make_ws_server();
+      reject("close...");
     });
     s.on("connection", (ws) => {
+      // 新規のwsに置換したい。
       resolve(ws);
+      console.log(`reconnection again!!`);
+      //   ws_message = make_ws_server();
+      //   api_server = http.createServer(make_http_server);
     });
   });
 }
