@@ -1,42 +1,7 @@
-const sock = new WebSocket("ws://127.0.0.1:5001");
 import { ctx } from "./canvas";
-sock.addEventListener("open", (e) => {
-  console.log("接続が開かれたときに呼び出されるイベント");
-});
-function connect() {
-  var ws = new WebSocket("ws://127.0.0.1:5001");
-  ws.onopen = function () {
-    console.log(`connect open on.`);
-  };
+import { sock, connect } from "./websocket";
 
-  ws.onmessage = function (e) {
-    console.log("Message:", e.data);
-    eventListener(e);
-  };
-
-  ws.onclose = function (e) {
-    console.log(
-      "Socket is closed. Reconnect will be attempted in 1 second.",
-      e.reason
-    );
-    setTimeout(function () {
-      connect();
-    }, 1000);
-  };
-
-  ws.onerror = function (err) {
-    console.log("エラーが発生したときに呼び出されるイベント");
-    console.error(
-      "Socket encountered error: ",
-      (err as any).message,
-      "Closing socket"
-    );
-    ws.close();
-  };
-}
-
-connect();
-
+// sockとctxの繋ぎ込み
 const eventListener = (message_e: MessageEvent<string>) => {
   console.log("メッセージ : " + `${message_e.data}`);
   const data = JSON.parse(message_e.data);
@@ -60,6 +25,7 @@ const eventListener = (message_e: MessageEvent<string>) => {
     console.log(`fill ends.`);
   }
 };
+connect(eventListener);
 
 const btn = document.querySelector("#hello-button");
 const input_value = document.querySelector<HTMLInputElement>("#input");
