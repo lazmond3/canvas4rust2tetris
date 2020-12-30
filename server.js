@@ -7,7 +7,7 @@ const hostname = "127.0.0.1";
 const api_port = 3000;
 const ws_port = 5001;
 
-const msock = (ws) => (req, res) => {
+const httpRequestHandlerBulder = (ws) => (req, res) => {
   // ここにrequestを書いていく
   var bodyChunks = [];
   let body;
@@ -55,7 +55,7 @@ function up_ws_server() {
     }
   });
   s.on("connection", (ws) => {
-    const method = msock(ws);
+    const method = httpRequestHandlerBulder(ws);
     if (api_server) {
       api_server.close();
     }
