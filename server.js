@@ -1,6 +1,7 @@
 // EXP: このファイルは、 API を叩かれたら、 websocketを通じて
 // html に入っている canvas のアップデートを行うもの。
 // TODO: nodejs による サーバを作成する
+// TODO: serverが自動でwsを繋ぎ直すようにしたい。
 const http = require("http");
 const hostname = "127.0.0.1";
 const api_port = 3000;
