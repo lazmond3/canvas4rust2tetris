@@ -7,10 +7,7 @@ const hostname = "127.0.0.1";
 const api_port = 3000;
 const ws_port = 5001;
 
-// ws server
-let ws_message = make_ws_server();
-
-const make_http_server = (req, res) => {
+const msock = (ws) => (req, res) => {
   // ここにrequestを書いていく
   var bodyChunks = [];
   let body;
@@ -27,16 +24,8 @@ const make_http_server = (req, res) => {
         const word = body.word;
         console.log(`pos: ${pos}, word: ${word}`);
 
-        // こいつがクロージャになっているために、
-        // ws_message が更新されても、反映されない.
-        ws_message
-          .then((ws) => {
-            console.log(`send websocket`);
-            ws.send(JSON.stringify(body));
-          })
-          .catch((e) => {
-            console.log(`error in ws_message: ${e}`);
-          });
+        console.log(`send websocket`);
+        ws.send(JSON.stringify(body));
       }
     });
 
@@ -45,42 +34,44 @@ const make_http_server = (req, res) => {
   res.end("Received.\n");
 };
 
-// API サーバ
-let api_server = http.createServer(make_http_server);
-
-api_server.listen(api_port, hostname, () => {
-  console.log(
-    `API Server running at http://${hostname}:${api_port}/: api server`
-  );
-});
-
-//  -----------------  WS_server --------------------
-function make_ws_server() {
+function up_ws_server() {
   const ws_server = require("ws").Server;
+  let api_server;
+
   const s = new ws_server({
     host: hostname,
     port: ws_port,
   });
-
-  console.log(`start listening... : websocket server`);
-
-  return new Promise((resolve, reject) => {
-    s.on("error", (e) => {
-      //ws_message には何もはいらない。
-      reject(e);
-    });
-    s.on("close", () => {
-      //ws_message には何もはいらない。
-      //   ws_message = make_ws_server();
-      reject("close...");
-    });
-    s.on("connection", (ws) => {
-      // 新規のwsに置換したい。
-      resolve(ws);
-      console.log(`reconnection again!!`);
-      //   ws_message = make_ws_server();
-      //   api_server = http.createServer(make_http_server);
+  s.on("error", (e) => {
+    console.log(`error: ${e}`);
+    if (api_server) {
+      api_server.close();
+    }
+  });
+  s.on("close", () => {
+    console.log("close...");
+    if (api_server) {
+      api_server.close();
+    }
+    setTimeout(function () {
+      up_ws_server();
+    }, 1000);
+  });
+  s.on("connection", (ws) => {
+    const method = msock(ws);
+    if (api_server) {
+      api_server.close();
+    }
+    try {
+      api_server = http.createServer(method);
+    } catch (e) {
+      console.log(`address in use...`);
+    }
+    api_server.listen(api_port, hostname, () => {
+      console.log(
+        `API Server running at http://${hostname}:${api_port}/: api server`
+      );
     });
   });
 }
-//  -----------------  WS_server --------------------
+up_ws_server();
