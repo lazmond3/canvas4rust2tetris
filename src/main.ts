@@ -14,7 +14,6 @@ sock.addEventListener("message", (message_e: MessageEvent<string>) => {
     const x = (pos % 32) * 16;
     const y = Math.floor(pos / 32);
     console.log(`x: ${x}, y: ${y}`);
-    // for (var i = 0; i < word.length; i++) {
     for (var i = 0; i < 16; i++) {
       const char = word[i];
       if (char === "O") {
