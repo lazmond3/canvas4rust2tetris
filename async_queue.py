@@ -11,7 +11,7 @@ async def post_async(data: str, line_number: int):
     await loop.run_in_executor(None, requests.post, url, data, headers)
     print("-- line number: {}".format(line_number))
 
-async def queue_execution(words, callback, parallel=2):
+async def queue_execution(words, callback, parallel=3000):
     loop = asyncio.get_event_loop()
     queue = asyncio.Queue()
 
