@@ -29,7 +29,6 @@ def main_async():
         *tasks_
     )
     results = loop.run_until_complete(tasks)
-    return results
 
 if __name__ == '__main__':
     main_async()
