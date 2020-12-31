@@ -1,18 +1,39 @@
-// use std::log::env_logger;
+// use std::collections::HashMap;
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    env_logger::init();
+use serde::{Deserialize, Serialize};
+use serde_json::{Result, Value};
 
-    println!("GET https://www.rust-lang.org");
+#[derive(Debug, Serialize, Deserialize)]
+struct Post {
+    id: Option<i32>,
+    title: String,
+    body: String,
+    #[serde(rename = "userId")]
+    user_id: i32,
+}
 
-    let mut res = reqwest::blocking::get("https://www.rust-lang.org/")?;
-
-    println!("Status: {}", res.status());
-    println!("Headers:\n{:?}", res.headers());
-
-    // copy the response body directly to stdout
-    res.copy_to(&mut std::io::stdout())?;
-
-    println!("\n\nDone.");
-    Ok(())
+#[tokio::main]
+async fn main() {
+    let param_a = "one_word";
+    let param_b = 123;
+    let param_c = "IIIIIIIIIIIIIIII";
+    // r#(Raw String Literal)でjsonを生成
+    let json_request = format!(
+        r#"{{
+      "type": "{}",
+      "pos": "{}",
+      "word": "{}"
+    }}"#,
+        param_a, param_b, param_c
+    );
+    let client = reqwest::Client::new();
+    let mut res: reqwest::Response = client
+        .post("http://localhost:3000/")
+        .header(reqwest::header::CONTENT_TYPE, "application/json")
+        .body(json_request)
+        .send()
+        .await
+        .unwrap();
+    let v = res.text().await.expect("inner result failed on L41");
+    println!("{}", v);
 }
