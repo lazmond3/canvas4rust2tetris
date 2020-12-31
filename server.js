@@ -11,6 +11,8 @@ const httpRequestHandlerBulder = (ws) => (req, res) => {
   // ここにrequestを書いていく
   var bodyChunks = [];
   let body;
+  let pos;
+  let word;
   req
     .on("data", function (chunk) {
       bodyChunks.push(chunk);
@@ -21,17 +23,16 @@ const httpRequestHandlerBulder = (ws) => (req, res) => {
       console.log(`body: ${JSON.stringify(body)}`);
       // そのままバイパスするコード
       if (body.type === "one_word") {
-        const pos = body.pos;
-        const word = body.word;
+        pos = body.pos;
+        word = body.word;
         console.log(`pos: ${pos}, word: ${word}`);
         console.log(`send websocket`);
         ws.send(JSON.stringify(body));
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "text/plain");
+        res.end(`Received. pos: ${pos} word: ${word}\n`);
       }
     });
-
-  res.statusCode = 200;
-  res.setHeader("Content-Type", "text/plain");
-  res.end("Received.\n");
 };
 
 function up_ws_server() {
